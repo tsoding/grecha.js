@@ -6,6 +6,8 @@ Simple Front-End JavaScript Framework. Originally designed for [emoteJAM](https:
 
 ## Quick Start
 
+https://tsoding.org/grecha.js/example.html
+
 ```html
 <!DOCTYPE html>
 <html>
