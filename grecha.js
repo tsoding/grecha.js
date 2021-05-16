@@ -61,7 +61,7 @@ function img(src) {
 function router(routes) {
     let result = div();
 
-    result.syncHash$ = function() {
+    function syncHash() {
         let hashLocation = document.location.hash.split('#')[1];
         if (!hashLocation) {
             hashLocation = '/';
@@ -74,11 +74,17 @@ function router(routes) {
             hashLocation = route404;
         }
 
-        while (this.firstChild) {
-            this.removeChild(this.lastChild);
+        while (result.firstChild) {
+            result.removeChild(result.lastChild);
         }
-        this.appendChild(routes[hashLocation]);
+        result.appendChild(routes[hashLocation]);
+
+        return result;
     };
+
+    syncHash();
+    // TODO: there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
+    window.addEventListener("hashchange", syncHash);
 
     return result;
 }

@@ -84,39 +84,34 @@ function webglPreview() {
 }
 
 window.onload = () => {
-    const app = router({
-        "/": div(
-            tabs({
-                "jebaited": jebaited(),
-                "blogpost": blogpost(),
-                "forsen1": forsen1(),
-                "lorem": div(LOREM),
-            }),
-            div(
-                h2("Other Pages"),
-                div(a("secret page").att$("href", "#/secret")),
-                div(a("webgl page").att$("href", "#/webgl")),
+    entry.appendChild(
+        router({
+            "/": div(
+                tabs({
+                    "jebaited": jebaited(),
+                    "blogpost": blogpost(),
+                    "forsen1": forsen1(),
+                    "lorem": div(LOREM),
+                }),
+                div(
+                    h2("Other Pages"),
+                    div(a("secret page").att$("href", "#/secret")),
+                    div(a("webgl page").att$("href", "#/webgl")),
+                )
+            ),
+            "/secret": div(
+                p("This is a secret page! What are you doing in here!"),
+                img("monkaMEGA.png"),
+                p(a("Back to Home").att$('href', '#'))
+            ),
+            "/webgl": div(
+                webglPreview(),
+                p(a("Back to Home").att$('href', '#'))
+            ),
+            "/404": div(
+                p("Path is not found"),
+                p(a("Back to Home").att$('href', '#'))
             )
-        ),
-        "/secret": div(
-            p("This is a secret page! What are you doing in here!"),
-            img("monkaMEGA.png"),
-            p(a("Back to Home").att$('href', '#'))
-        ),
-        "/webgl": div(
-            webglPreview(),
-            p(a("Back to Home").att$('href', '#'))
-        ),
-        "/404": div(
-            p("Path is not found"),
-            p(a("Back to Home").att$('href', '#'))
-        )
-    });
-
-    app.syncHash$();
-    window.addEventListener("hashchange", () => {
-        app.syncHash$();
-    });
-
-    entry.appendChild(app);
+        })
+    );
 }
