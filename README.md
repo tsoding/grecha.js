@@ -23,16 +23,22 @@ Simple Front-End JavaScript Framework. Originally designed for [emoteJAM](https:
             h1("Grecha.js"),
             div(a("Foo").att$("href", "#/foo")),
             div(a("Bar").att$("href", "#/bar")),
-            div(kasha).onclick$(() => {
-                kasha.replaceWith(kashaHard);
+            div(kasha).onclick$(function () {
+                if (this.contains(kasha)) {
+                    kasha.replaceWith(kashaHard);
+                } else {
+                    kashaHard.replaceWith(kasha);
+                }
             }),
           ),
           "/foo": div(
             h1("Foo"),
-            div(a("Home").att$("href", "#"))
+            p(LOREM),
+            div(a("Home").att$("href", "#")),
           ),
           "/bar": div(
             h1("Bar"),
+            p(LOREM),
             div(a("Home").att$("href", "#"))
           )
         })
