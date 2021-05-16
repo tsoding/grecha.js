@@ -2,9 +2,10 @@ function tag(name, ...children) {
     const result = document.createElement(name);
     for (const child of children) {
         if (typeof(child) === 'string') {
-            throw new Error('Looks like you are trying to add string as the tag component. Wrap it with the text() function to turn the string into the Text Node');
+            result.appendChild(document.createTextNode(child));
+        } else {
+            result.appendChild(child);
         }
-        result.appendChild(child);
     }
 
     result.att$ = function(name, value) {
@@ -18,10 +19,6 @@ function tag(name, ...children) {
     };
 
     return result;
-}
-
-function text(s) {
-    return document.createTextNode(s);
 }
 
 function canvas(...children) {
@@ -62,7 +59,7 @@ function img(src) {
 
 // TODO: the router component should create the pages lazily
 function router(routes) {
-    let result = div(text("Hash is not synced!"));
+    let result = div();
 
     result.syncHash$ = function() {
         let hashLocation = document.location.hash.split('#')[1];
