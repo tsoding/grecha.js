@@ -32,7 +32,7 @@ function img(src) {
     return tag("img").att$("src", src);
 }
 
-// TODO: the router component should create the pages lazily
+// TODO(#1): the router component should create the pages lazily
 function router(routes) {
     let result = div();
 
