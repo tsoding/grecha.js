@@ -23,13 +23,17 @@ function tag(name, ...children) {
     return result;
 }
 
-const MUNDANE_TAGS = ["canvas", "h1", "h2", "h3", "p", "a", "div", "span"];
+const MUNDANE_TAGS = ["canvas", "h1", "h2", "h3", "p", "a", "div", "span", "select"];
 for (let tagName of MUNDANE_TAGS) {
     window[tagName] = (...children) => tag(tagName, ...children);
 }
 
 function img(src) {
     return tag("img").att$("src", src);
+}
+
+function input(type) {
+    return tag("input").att$("type", type);
 }
 
 // TODO(#1): the router component should create the pages lazily
