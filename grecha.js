@@ -23,36 +23,9 @@ function tag(name, ...children) {
     return result;
 }
 
-function canvas(...children) {
-    return tag("canvas", ...children);
-}
-
-function h1(...children) {
-    return tag("h1", ...children);
-}
-
-function h2(...children) {
-    return tag("h2", ...children);
-}
-
-function h3(...children) {
-    return tag("h3", ...children);
-}
-
-function p(...children) {
-    return tag("p", ...children);
-}
-
-function a(...children) {
-    return tag("a", ...children);
-}
-
-function div(...children) {
-    return tag("div", ...children);
-}
-
-function span(...children) {
-    return tag("span", ...children);
+const MUNDANE_TAGS = ["canvas", "h1", "h2", "h3", "p", "a", "div", "span"];
+for (let tagName of MUNDANE_TAGS) {
+    window[tagName] = (...children) => tag(tagName, ...children);
 }
 
 function img(src) {
