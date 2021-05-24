@@ -58,7 +58,7 @@ function router(routes) {
     };
 
     syncHash();
-    // TODO: there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
+    // TODO(#3): there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
     window.addEventListener("hashchange", syncHash);
 
     return result;
