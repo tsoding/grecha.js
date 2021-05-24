@@ -43,7 +43,7 @@ function router(routes) {
         }
 
         if (!(hashLocation in routes)) {
-            // TODO: make the route404 customizable in the router component
+            // TODO(#2): make the route404 customizable in the router component
             const route404 = '/404';
             console.assert(route404 in routes);
             hashLocation = route404;
