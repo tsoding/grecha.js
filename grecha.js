@@ -36,7 +36,6 @@ function input(type) {
     return tag("input").att$("type", type);
 }
 
-// TODO(#1): the router component should create the pages lazily
 function router(routes) {
     let result = div();
 
@@ -62,8 +61,12 @@ function router(routes) {
     };
 
     syncHash();
-    // TODO(#3): there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
     window.addEventListener("hashchange", syncHash);
 
-    return result;
+    const destroyRouter = () => window.removeEventListener("hashchange", syncHash);
+
+    return {
+        routes: result,
+        destroy: destroyRouter
+    };
 }
