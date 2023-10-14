@@ -25,7 +25,7 @@ function tag(name, ...children) {
 
 const MUNDANE_TAGS = ["canvas", "h1", "h2", "h3", "p", "a", "div", "span", "select"];
 for (let tagName of MUNDANE_TAGS) {
-    window[tagName] = (...children) => tag(tagName, ...children);
+    window[tagName] = tag.bind(null, tagName);
 }
 
 function img(src) {
