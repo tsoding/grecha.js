@@ -7,33 +7,33 @@
     <script>
       const kasha = img("Kasha.png");
       const kashaHard = img("KashaHard.gif");
-
-      entry.appendChild(
-        router({
-          "/": div(
-            h1("Grecha.js"),
-            div(a("Foo").att$("href", "#/foo")),
-            div(a("Bar").att$("href", "#/bar")),
-            div(kasha).onclick$(function () {
-                if (this.contains(kasha)) {
-                    kasha.replaceWith(kashaHard);
-                } else {
-                    kashaHard.replaceWith(kasha);
-                }
-            }),
-          ),
-          "/foo": div(
-            h1("Foo"),
-            p(LOREM),
-            div(a("Home").att$("href", "#")),
-          ),
-          "/bar": div(
-            h1("Bar"),
-            p(LOREM),
-            div(a("Home").att$("href", "#"))
-          )
-        })
-      );
+      
+      let count = 0;
+      let hard = false;
+      const r = router({
+        "/": () => div(
+          h1("Grecha.js"),
+          div(a("Foo").att$("href", "#/foo")),
+          div(a("Bar").att$("href", "#/bar")),
+          div("Counter: "+count),
+          div(hard ? kashaHard : kasha).onclick$(function () {
+            count += 1;
+            hard = !hard
+            r.refresh();
+          }),
+        ),
+        "/foo": () => div(
+          h1("Foo"),
+          p(LOREM),
+          div(a("Home").att$("href", "#")),
+        ),
+        "/bar": () => div(
+          h1("Bar"),
+          p(LOREM),
+          div(a("Home").att$("href", "#"))
+        )
+      });
+      entry.appendChild(r);
     </script>
   </body>
 </html>

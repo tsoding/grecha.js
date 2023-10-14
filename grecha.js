@@ -56,14 +56,14 @@ function router(routes) {
         while (result.firstChild) {
             result.removeChild(result.lastChild);
         }
-        result.appendChild(routes[hashLocation]);
+        result.appendChild(routes[hashLocation]());
 
         return result;
     };
-
     syncHash();
     // TODO(#3): there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
     window.addEventListener("hashchange", syncHash);
+    result.refresh = syncHash;
 
     return result;
 }
