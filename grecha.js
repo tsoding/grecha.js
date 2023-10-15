@@ -36,7 +36,6 @@ function input(type) {
     return tag("input").att$("type", type);
 }
 
-// TODO(#1): the router component should create the pages lazily
 function router(routes) {
     let result = div();
 
