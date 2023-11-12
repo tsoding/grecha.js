@@ -52,11 +52,7 @@ function router(routes) {
             hashLocation = route404;
         }
 
-        while (result.firstChild) {
-            result.removeChild(result.lastChild);
-        }
-        result.appendChild(routes[hashLocation]());
-
+        result.replaceChildren(routes[hashLocation]());
         return result;
     };
     syncHash();
