@@ -7,21 +7,23 @@
     <script>
       const kasha = img("Kasha.png");
       const kashaHard = img("KashaHard.gif");
-      
-      let count = 0;
-      let hard = false;
+
       const r = router({
-        "/": () => div(
-          h1("Grecha.js"),
-          div(a("Foo").att$("href", "#/foo")),
-          div(a("Bar").att$("href", "#/bar")),
-          div("Counter: "+count),
-          div(hard ? kashaHard : kasha).onclick$(function () {
-            count += 1;
-            hard = !hard
-            r.refresh();
-          }),
-        ),
+        "/": (r) => {
+          const [count, setCount] = r.useState(0);
+          const [hard, setHard] = r.useState(false);
+
+          return div(
+            h1("Grecha.js"),
+            div(a("Foo").att$("href", "#/foo")),
+            div(a("Bar").att$("href", "#/bar")),
+            div(`Counter: ${count()}`),
+            div(hard() ? kashaHard : kasha).onclick$(() => {
+              setCount(count() + 1);
+              setHard(!hard());
+            }),
+          )
+        },
         "/foo": () => div(
           h1("Foo"),
           p(LOREM),

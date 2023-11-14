@@ -28,37 +28,42 @@ for (let tagName of MUNDANE_TAGS) {
     window[tagName] = (...children) => tag(tagName, ...children);
 }
 
-function img(src) {
-    return tag("img").att$("src", src);
-}
-
-function input(type) {
-    return tag("input").att$("type", type);
-}
+const img = (src) => tag("img").att$("src", src);
+const input = (type) => tag("input").att$("type", type);
 
 function router(routes) {
-    let result = div();
+    const result = div();
 
-    function syncHash() {
-        let hashLocation = document.location.hash.split('#')[1];
-        if (!hashLocation) {
-            hashLocation = '/';
-        }
+    for (const k in routes)
+        routes[k].state = { id: 0 };
+    const currentLocation = { value: "/" };
+    const state = () => routes[currentLocation.value].state;
 
+    result.refresh = () => {
+        state().id = 0;
+        let hashLocation = document.location.hash.split('#')[1] || '/';
         if (!(hashLocation in routes)) {
             // TODO(#2): make the route404 customizable in the router component
             const route404 = '/404';
             console.assert(route404 in routes);
             hashLocation = route404;
         }
-
-        result.replaceChildren(routes[hashLocation]());
+        currentLocation.value = hashLocation;
+        result.replaceChildren(routes[hashLocation](result));
         return result;
     };
-    syncHash();
-    // TODO(#3): there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
-    window.addEventListener("hashchange", syncHash);
-    result.refresh = syncHash;
 
+    result.useState = (initialValue) => {
+        const id = state().id++;
+        state()[id] = state()[id] ?? initialValue;
+        return [() => state()[id], (v) => {
+            state()[id] = v;
+            result.refresh();
+        }];
+    };
+
+    result.refresh(routes);
+    // TODO(#3): there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
+    window.addEventListener("hashchange", () => result.refresh(result));
     return result;
 }
