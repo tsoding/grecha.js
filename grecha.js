@@ -1,64 +1,98 @@
 const LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
-function tag(name, ...children) {
-    const result = document.createElement(name);
+class ElementWrapper {
+
+  /* We create attractive class. */
+
+  constructor(name, ...children) {
+    this.element = document.createElement(name)
+
+    let methods = this.methods();
+
+    Object.assign(this, methods);
+    Object.assign(this.element, methods);
+
     for (const child of children) {
-        if (typeof(child) === 'string') {
-            result.appendChild(document.createTextNode(child));
-        } else {
-            result.appendChild(child);
-        }
+      if (typeof child === 'string') {
+        this.element.appendChild(document.createTextNode(child));
+      } else if (child instanceof ElementWrapper) {
+        this.element.appendChild(child.element);
+      } else {
+        this.element.appendChild(child);
+      }
     }
+  }
 
-    result.att$ = function(name, value) {
-        this.setAttribute(name, value);
-        return this;
-    };
+  methods() {
+    let cw = this
+    return {
 
-    result.onclick$ = function(callback) {
-        this.onclick = callback;
-        return this;
-    };
+      att$(name, value) {
+        cw.element.setAttribute(name, value);
+        return cw;
+      },
 
-    return result;
+      onclick$(callback) {
+        cw.element.onclick = callback;
+        return cw;
+      },
+
+      get$() {
+        return cw.element;
+      },
+
+      wrapper$() {
+        return cw;
+      }
+
+    }
+  }
 }
 
 const MUNDANE_TAGS = ["canvas", "h1", "h2", "h3", "p", "a", "div", "span", "select"];
-for (let tagName of MUNDANE_TAGS) {
-    window[tagName] = (...children) => tag(tagName, ...children);
+for (const tagName of MUNDANE_TAGS) {
+  window[tagName] = (...children) => new ElementWrapper(tagName, ...children).get$();
 }
 
 function img(src) {
-    return tag("img").att$("src", src);
+  return new ElementWrapper("img").att$("src", src).get$();
 }
 
 function input(type) {
-    return tag("input").att$("type", type);
+  return new ElementWrapper("input").att$("type", type).get$();
 }
 
 function router(routes) {
-    let result = div();
+  const resultWrapper = new ElementWrapper("div");
+  const result = resultWrapper.get$();
 
-    function syncHash() {
-        let hashLocation = document.location.hash.split('#')[1];
-        if (!hashLocation) {
-            hashLocation = '/';
-        }
+  let methods = {
+    syncHash() {
+      let hashLocation = document.location.hash.split('#')[1] || '/';
+      const route404 = '/404';
 
-        if (!(hashLocation in routes)) {
-            // TODO(#2): make the route404 customizable in the router component
-            const route404 = '/404';
-            console.assert(route404 in routes);
-            hashLocation = route404;
-        }
+      if (!(hashLocation in routes)) {
+        console.assert(route404 in routes, `Route "${route404}" not found among the routes.`);
+        hashLocation = route404;
+      }
 
-        result.replaceChildren(routes[hashLocation]());
-        return result;
-    };
-    syncHash();
-    // TODO(#3): there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
-    window.addEventListener("hashchange", syncHash);
-    result.refresh = syncHash;
+      result.replaceChildren(routes[hashLocation]());
+    },
 
-    return result;
+    destroy() {
+      window.removeEventListener("hashchange", methods.syncHash);
+    }
+  }
+
+  window.addEventListener("hashchange", methods.syncHash);
+
+  Object.assign(result, methods);
+
+  // @ Some simplification/quality of life changes. 
+  result.refresh = result.syncHash;
+  // ---
+
+  methods.syncHash();
+
+  return result;
 }
