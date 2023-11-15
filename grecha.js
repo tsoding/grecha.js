@@ -47,52 +47,87 @@ class ElementWrapper {
 
     }
   }
+
+  _changeElement(el) {
+    this.element = el;
+
+    this._applyMethods();
+
+    return this;
+  }
+
+  _applyMethods() {
+    Object.assign(this.element, methods);
+  }
 }
 
+// @ Tag-init for basic wrapping tags
 const MUNDANE_TAGS = ["canvas", "h1", "h2", "h3", "p", "a", "div", "span", "select"];
 for (const tagName of MUNDANE_TAGS) {
   window[tagName] = (...children) => new ElementWrapper(tagName, ...children).get$();
 }
+// ---
 
-function img(src) {
-  return new ElementWrapper("img").att$("src", src).get$();
-}
+// @ Tagware
+const windowMethods = {
 
-function input(type) {
-  return new ElementWrapper("input").att$("type", type).get$();
-}
+  img(src) {
+    return new ElementWrapper("img").att$("src", src).get$();
+  },
 
-function router(routes) {
-  const resultWrapper = new ElementWrapper("div");
-  const result = resultWrapper.get$();
+  input(type) {
+    return new ElementWrapper("input").att$("type", type).get$();
+  },
 
-  let methods = {
-    syncHash() {
-      let hashLocation = document.location.hash.split('#')[1] || '/';
-      const route404 = '/404';
+  button(text) {
+    return new ElementWrapper("button").att$("text", text).get$();
+  },
 
-      if (!(hashLocation in routes)) {
-        console.assert(route404 in routes, `Route "${route404}" not found among the routes.`);
-        hashLocation = route404;
-      }
-
-      result.replaceChildren(routes[hashLocation]());
-    },
-
-    destroy() {
-      window.removeEventListener("hashchange", methods.syncHash);
+  select(...options) {
+    let select = new ElementWrapper("select").get$();
+    for (const option of options) {
+      select.appendChild(new ElementWrapper("option").att$("value", option).get$());
     }
-  }
+    return select;
+  },
 
-  window.addEventListener("hashchange", methods.syncHash);
+  router(routes) {
+    const resultWrapper = new ElementWrapper("div");
+    const result = resultWrapper.get$();
 
-  Object.assign(result, methods);
+    let methods = {
+      syncHash() {
+        const url = new URL(window.location);
+        let hashLocation = url.hash.slice(1) || '/';
+        const route404 = '/404';
 
-  // @ Some simplification/quality of life changes. 
-  result.refresh = result.syncHash;
-  // ---
+        if (!(hashLocation in routes)) {
+          console.assert(route404 in routes, `Route "${route404}" not found among the routes.`);
+          hashLocation = route404;
+        }
 
-  methods.syncHash();
+        result.replaceChildren(routes[hashLocation]());
+      },
 
-  return result;
+      destroy() {
+        window.removeEventListener("hashchange", methods.syncHash);
+      }
+    }
+
+    window.addEventListener("hashchange", methods.syncHash);
+
+    Object.assign(result, methods);
+
+    // @ Some simplification/quality of life changes. 
+    result.refresh = result.syncHash;
+    // ---
+
+    methods.syncHash();
+
+    return result;
+  },
+
 }
+// ---
+
+Object.assign(window, windowMethods);
