@@ -1,7 +1,7 @@
 class Grecha {
   constructor(window) {
     let g_ = this;
-    
+
     class ElementWrapper {
 
       static LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
@@ -117,10 +117,18 @@ class Grecha {
         // @ CREDIT (FORK): juniorrantila
         for (const k in routes) routes[k].state = { id: 0 };
 
-        const currentLocation = { value: "/" };
+        let locations = {
+          url() { return new URL(window.location) },
+          hashLocation(url) { return (url ?? this.url()).hash.slice(1) || '/' },
+        }
+
+        var url = locations.url();
+        var hashLocation = locations.hashLocation();
+
+        const currentLocation = { value: hashLocation };
         const state = () => routes[currentLocation.value].state;
         // ---
-        
+
         let methods = {
 
           get __handler__() { return window[GR_SYM] },
@@ -129,8 +137,9 @@ class Grecha {
             // @ CREDIT (FORK): juniorrantila
             state().id = 0;
 
-            const url = new URL(window.location);
-            let hashLocation = url.hash.slice(1) || '/';
+            url = locations.url();
+            hashLocation = locations.hashLocation(url);
+
             const route404 = '/404';
 
             if (!(hashLocation in routes)) {
@@ -161,7 +170,7 @@ class Grecha {
             state()[id] = state()[id] ?? initialValue;
 
             return [
-              () => state()[id], 
+              () => state()[id],
               (v) => {
                 state()[id] = v;
                 result.refresh();
