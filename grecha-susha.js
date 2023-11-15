@@ -59,6 +59,7 @@ class Grecha {
             return cw;
           },
 
+          // @ Tag Wrapper
           wrap$(t) {
             // Contains <b data-grecha>?
             // Get Only child
@@ -116,6 +117,7 @@ class Grecha {
 
           },
 
+          // Into Link
           link$(href, text) {
             let wrapped = this.wrap$('a')
 
@@ -129,6 +131,7 @@ class Grecha {
             }
           },
 
+          // Set XY
           absolutePos$(x, y) {
             cw.element.style.position = 'absolute';
             cw.element.style.display = 'flex';
@@ -138,6 +141,7 @@ class Grecha {
             cw.element.style.top = y;
           },
 
+          // Reset Position
           resetPos$() {
             cw.element.style.position = 'static';
             cw.element.style.display = 'block';
@@ -146,7 +150,6 @@ class Grecha {
             cw.element.style.left = '';
             cw.element.style.top = '';
           },
-
 
           // Register a new attribute for a custom data type
           data$(key, value) {
@@ -288,8 +291,6 @@ class Grecha {
               .catch(error => console.error('Error:', error));
             return this;
           },
-
-
         }
 
 
@@ -339,7 +340,7 @@ class Grecha {
         }
         return select;
       },
-      
+
       // @ Router
       router(routes) {
         const resultWrapper = new ElementWrapper("div");
@@ -368,7 +369,7 @@ class Grecha {
           currentLocation.value = '/';
         }
         const state = () => routes[currentLocation.value].state;
-        
+
         // ---
 
         let methods = {
@@ -438,7 +439,41 @@ class Grecha {
 
         return result;
       },
+
+      // @ Quick-Canvas
+      qCanvas(...args) {
+        const canvas = new ElementWrapper("canvas").get$();
+        const ctx = canvas.getContext("2d");
+
+        for (const [i, arg] of args.entries()) {
+          if (typeof arg === "string") {
+            canvas.setAttribute(arg, args[i + 1]);
+          }
+
+          else if (typeof arg === "function") {
+            canvas.addEventListener(arg.name, arg);
+          }
+
+          else if (typeof arg === "object") {
+            Object.assign(canvas, arg);
+          }
+        }
+
+        return {
+          canvas,
+          ctx,
+        };
+      },
+
+      // @ Quick-Image
+      qImage(src) {
+        const image = new ElementWrapper("img").att$("src", src).get$();
+        return {
+          image,
+        };
       
+      },
+
     }
     // ---
 
