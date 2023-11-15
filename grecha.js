@@ -111,6 +111,7 @@ class Grecha {
 
         const GR_SYM = Symbol.for("grecha-router")
 
+        // Expose wrapper for quick access
         window[GR_SYM] = resultWrapper;
 
         // @ CREDIT (FORK): juniorrantila
