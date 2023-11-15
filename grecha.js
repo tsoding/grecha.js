@@ -54,7 +54,77 @@ class Grecha {
 
           wrapper$() {
             return cw;
-          }
+          },
+
+          wrap$(t) {
+            // Contains <b data-grecha>?
+            // Get Only child
+
+            let w = cw.element.querySelector('[data-grecha="wrap$' + t + '"]');
+
+            // has attr ?
+            if (!w) {
+              let b = new ElementWrapper(t);
+
+              if (t && t instanceof HTMLElement) {
+                b._changeElement(t);
+              }
+
+              b.att$('data-grecha', 'wrap$' + t);
+
+              b.element.innerHTML = cw.element.innerHTML
+              cw.element.innerHTML = '';
+              cw.element.appendChild(b.element);
+
+              return cw.element;
+            } else {
+
+              // Get wrapped element
+
+              console.log(w);
+              cw.element.innerHTML = w.innerHTML;
+              w.innerHTML = '';
+              
+              // Remove w node from Document.
+              w?.remove?.()
+              
+              return cw.element;
+
+            }
+          },
+
+          bold$() {
+            return this.wrap$('b')
+
+          },
+
+          italic$() {
+            return this.wrap$('i')
+
+          },
+
+          underline$() {
+            return cw.wrap$('u')
+
+          },
+
+          strike$() {
+            return cw.wrap$('s')
+
+          },
+
+          link$(href, text) {
+            let wrapped = this.wrap$('a')
+
+            if (wrapped && (href||text)) {
+              wrapped.firstChild.att$('href', href)
+              wrapped.firstChild.att$('target', '_blank')
+              wrapped.firstChild.att$('rel', 'noopener noreferrer')
+              wrapped.firstChild.att$('title', text)
+
+              return wrapped
+            }
+          },
 
         }
       }
@@ -68,7 +138,7 @@ class Grecha {
       }
 
       _applyMethods() {
-        Object.assign(this.element, methods);
+        Object.assign(this.element, this.methods);
       }
     }
 
