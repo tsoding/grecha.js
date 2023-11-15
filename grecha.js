@@ -36,10 +36,10 @@ function input(type) {
     return tag("input").att$("type", type);
 }
 
-function router(routes) {
+function router(routes, stateData) {
     let result = div();
 
-    function syncHash() {
+    result.refresh = ()=>{
         let hashLocation = document.location.hash.split('#')[1];
         if (!hashLocation) {
             hashLocation = '/';
@@ -55,10 +55,10 @@ function router(routes) {
         result.replaceChildren(routes[hashLocation]());
         return result;
     };
-    syncHash();
+    result.refresh();
     // TODO(#3): there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
-    window.addEventListener("hashchange", syncHash);
-    result.refresh = syncHash;
-
+    window.addEventListener("hashchange", result.refresh);
+    result.observer = new MutationObserver(result.refresh);
+    stateData?.forEach(e => result.observer.observe(e,{childList: true,subtree: true,attributes:true}));
     return result;
 }

@@ -2,38 +2,41 @@
 <html>
   <head><title>Grecha.js</title></head>
   <body>
+
+    <input id="count" type="hidden" value="0"></input>
+    <input id="hard" type="hidden" value="false"></input>
+
     <div id="entry"></div>
     <script src="./grecha.js"></script>
     <script>
       const kasha = img("Kasha.png");
       const kashaHard = img("KashaHard.gif");
       
-      let count = 0;
-      let hard = false;
-      const r = router({
-        "/": () => div(
-          h1("Grecha.js"),
-          div(a("Foo").att$("href", "#/foo")),
-          div(a("Bar").att$("href", "#/bar")),
-          div("Counter: "+count),
-          div(hard ? kashaHard : kasha).onclick$(function () {
-            count += 1;
-            hard = !hard
-            r.refresh();
-          }),
-        ),
-        "/foo": () => div(
-          h1("Foo"),
-          p(LOREM),
-          div(a("Home").att$("href", "#")),
-        ),
-        "/bar": () => div(
-          h1("Bar"),
-          p(LOREM),
-          div(a("Home").att$("href", "#"))
-        )
-      });
-      entry.appendChild(r);
+      entry.appendChild(router(
+        {
+          "/": () => div(
+            h1("Grecha.js"),
+            div(a("Foo").att$("href", "#/foo")),
+            div(a("Bar").att$("href", "#/bar")),
+            div("Counter: "+window.count.value),
+            div(window.hard.value=='true' ? kashaHard : kasha).onclick$(function () {
+              window.count.value = Number(window.count.value) + 1;
+              window.hard.value = !(window.hard.value=='true');
+            }),
+          ),
+          "/foo": () => div(
+            h1("Foo"),
+            p(LOREM),
+            div(a("Home").att$("href", "#")),
+          ),
+          "/bar": () => div(
+            h1("Bar"),
+            p(LOREM),
+            div(a("Home").att$("href", "#"))
+          )
+        },
+        [window.count, window.hard]
+      ));
     </script>
   </body>
 </html>
