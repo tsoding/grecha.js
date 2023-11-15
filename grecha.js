@@ -111,17 +111,19 @@ class Grecha {
 
         window[GR_SYM] = resultWrapper;
 
-        // @ CREDIT: juniorrantila
+        // @ CREDIT (FORK): juniorrantila
         for (const k in routes) routes[k].state = { id: 0 };
 
         const currentLocation = { value: "/" };
         const state = () => routes[currentLocation.value].state;
-
+        // ---
+        
         let methods = {
 
           get __handler__() { return window[GR_SYM] },
 
           syncHash() {
+            // @ CREDIT (FORK): juniorrantila
             state().id = 0;
 
             const url = new URL(window.location);
@@ -143,6 +145,7 @@ class Grecha {
             window.removeEventListener("hashchange", methods.syncHash);
           },
 
+          // @ CREDIT (FORK): juniorrantila
           useState(initialValue) {
             const id = state().id++;
 
@@ -156,6 +159,7 @@ class Grecha {
               }
             ];
           },
+          // ---
 
         }
 
