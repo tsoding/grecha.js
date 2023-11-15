@@ -111,11 +111,19 @@ class Grecha {
 
         window[GR_SYM] = resultWrapper;
 
+        // @ CREDIT: juniorrantila
+        for (const k in routes) routes[k].state = { id: 0 };
+
+        const currentLocation = { value: "/" };
+        const state = () => routes[currentLocation.value].state;
+
         let methods = {
 
           get __handler__() { return window[GR_SYM] },
 
           syncHash() {
+            state().id = 0;
+
             const url = new URL(window.location);
             let hashLocation = url.hash.slice(1) || '/';
             const route404 = '/404';
@@ -125,12 +133,30 @@ class Grecha {
               hashLocation = route404;
             }
 
-            result.replaceChildren(routes[hashLocation]());
+            result.replaceChildren(routes[hashLocation](result));
+            currentLocation.value = hashLocation;
+
+            return result;
           },
 
           destroyGrechaSync() {
             window.removeEventListener("hashchange", methods.syncHash);
-          }
+          },
+
+          useState(initialValue) {
+            const id = state().id++;
+
+            state()[id] = state()[id] ?? initialValue;
+
+            return [
+              () => state()[id], 
+              (v) => {
+                state()[id] = v;
+                result.refresh();
+              }
+            ];
+          },
+
         }
 
         window.addEventListener("hashchange", methods.syncHash);
@@ -148,14 +174,14 @@ class Grecha {
 
     }
     // ---
-    
+
     // @ Class Exports
     if (typeof module !== 'undefined') {
       module.exports = windowMethods;
     } else {
       Object.assign(window, windowMethods);
     }
-    
+
   }
 }
 
