@@ -291,6 +291,61 @@ class Grecha {
               .catch(error => console.error('Error:', error));
             return this;
           },
+
+          style$(styleObject) {
+            Object.assign(this.element.style, styleObject);
+          },
+
+          stylesheet$: {
+
+            // Stylesheets have more power than inline styles
+            // They always come first
+
+            // Total manipulation of the stylesheet allows for advanced styling
+
+            get ss() {
+              if (!this._stylesheet) {
+                this._stylesheet = document.createElement('style');
+                this.element.appendChild(this._stylesheet);
+              }
+              return this._stylesheet;
+
+            },
+
+            set ss(styleSheet) {
+              this._stylesheet = styleSheet;
+            },
+
+            get css() {
+              return this.ss.sheet.cssRules;
+
+            },
+
+            set css(cssRules) {
+              this.ss.sheet.cssRules = cssRules;
+
+            },
+
+
+            // Append rules as strings
+            appendRules$(...rules) {
+              rules.forEach((rule) => {
+                this.ss.sheet.insertRule(rule, this.ss.sheet.cssRules.length);
+              });
+              return this;
+
+            },
+
+            removeRule$(selector) {
+              this.ss.sheet.deleteRule(this.ss.sheet.cssRules.length - 1);
+            },
+
+            important$(selector, rule) {
+              // ... !important
+              this.ss.sheet.insertRule(selector + ' { ' + rule + ' !important; }', this.ss.sheet.cssRules.length);
+            },
+
+          },
         }
 
 
@@ -309,24 +364,35 @@ class Grecha {
       }
     }
 
-    // @ Tag-init for basic wrapping tags
-    const MUNDANE_TAGS = ["canvas", "h1", "h2", "h3", "p", "a", "div", "span"];
-
-    for (const tagName of MUNDANE_TAGS) {
-      window[tagName] = (...children) => new ElementWrapper(tagName, ...children).get$();
-    }
-    // ---
-
-    // @ Tagware
-
     function tag(tag, ...children) {
       return new ElementWrapper(tag, ...children).get$();
     }
 
+    // @ Tag-init for basic wrapping tags
+    const MUNDANE_TAGS = [
+      "canvas",
+
+      "h1",
+      "h2",
+      "h3",
+
+      "p",
+      "a",
+
+      "div",
+      "span"
+    ];
+
+    for (const tagName of MUNDANE_TAGS) {
+      window[tagName] = (...children) => tag(tagName, ...children);
+    }
+    // ---
+
+    // @ Tagware
     const windowMethods = {
 
       tag,
-      
+
       // @ Basic
       img(src) {
         // return new ElementWrapper("img").att$("src", src).get$();
@@ -353,7 +419,7 @@ class Grecha {
 
       // @ Router
       router(routes) {
-        const resultWrapper = tag("div").wrapper$();
+        const resultWrapper = div().wrapper$();
         const result = resultWrapper.get$();
 
         const GR_SYM = ElementWrapper.RouterSymbol;
@@ -452,7 +518,7 @@ class Grecha {
 
       // @ Quick-Canvas
       qCanvas(...args) {
-        const canvas = tag("canvas");
+        const canvas = canvas();
         const ctx = canvas.getContext("2d");
 
         for (const [i, arg] of args.entries()) {
@@ -477,7 +543,7 @@ class Grecha {
 
       // @ Quick-Image
       qImage(src) {
-        const image = tag("img").att$("src", src);
+        const image = img(src)
         return {
           image,
         };
@@ -485,17 +551,38 @@ class Grecha {
       },
 
       tabSwitcher(names, choose) {
-        names.map((name, i) => {
-          return tag("a", [
-            tag("p", [
-              name
-            ])
+        div(
+          ...names.map((name, i) => {
+            return span(
+              a(
+                p(name)
+                  // @ We spec.
+                  .att$("href", `#`)
+                  .onclick$(() => choose(i))
+              )
+            ).att$('class', 'tab')
 
-              .att$("href", `#`)
-              .onclick$(() => choose(i))
-          ])
-        })
-      }
+          })
+        ).att$('class', 'tab-switcher')
+      },
+
+      tabs(ts) {
+        const names = Object.keys(ts);
+        const tags = names.map((name, i) => ts[name]);
+
+        let active = 0;
+        const tabSlot = div(
+          tags[active]
+        )
+
+        return div(
+          this.tabSwitcher(names, (i) => {
+            tabSlot.replaceChildren(tags[active]);
+            tabSlot.appendChild(tags[i]);
+            active = i;
+          })
+        )
+      },
 
     }
     // ---
