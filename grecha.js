@@ -363,7 +363,12 @@ class Grecha {
         var hashLocation = locations.hashLocation();
 
         const currentLocation = { value: hashLocation };
+
+        if (!routes[currentLocation.value]) {
+          currentLocation.value = '/';
+        }
         const state = () => routes[currentLocation.value].state;
+        
         // ---
 
         let methods = {

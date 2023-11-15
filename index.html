@@ -40,6 +40,12 @@
         h1("Bar"),
         p(LOREM),
         div(a("Home").att$("href", "#"))
+      ),
+
+      '/404': () => div(
+        h1("404"),
+        p("You've hit an error page!!"),
+        div(a("Home").att$("href", "#"))
       )
       
     });
