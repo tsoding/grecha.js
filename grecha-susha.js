@@ -318,32 +318,42 @@ class Grecha {
     // ---
 
     // @ Tagware
+
+    function tag(tag, ...children) {
+      return new ElementWrapper(tag, ...children).get$();
+    }
+
     const windowMethods = {
 
+      tag,
+      
       // @ Basic
       img(src) {
-        return new ElementWrapper("img").att$("src", src).get$();
+        // return new ElementWrapper("img").att$("src", src).get$();
+        return tag("img").att$("src", src)
       },
 
       input(type) {
-        return new ElementWrapper("input").att$("type", type).get$();
+        // return new ElementWrapper("input").att$("type", type).get$();
+        return tag("input").type$(type)
       },
 
       button(text) {
-        return new ElementWrapper("button").att$("text", text).get$();
+        // return new ElementWrapper("button").att$("text", text).get$();
+        return tag("button").att$('text', text)
       },
 
       select(...options) {
-        let select = new ElementWrapper("select").get$();
+        let select = tag("select");
         for (const option of options) {
-          select.appendChild(new ElementWrapper("option").att$("value", option).get$());
+          select.appendChild(tag("option").att$("value", option));
         }
         return select;
       },
 
       // @ Router
       router(routes) {
-        const resultWrapper = new ElementWrapper("div");
+        const resultWrapper = tag("div").wrapper$();
         const result = resultWrapper.get$();
 
         const GR_SYM = ElementWrapper.RouterSymbol;
@@ -442,7 +452,7 @@ class Grecha {
 
       // @ Quick-Canvas
       qCanvas(...args) {
-        const canvas = new ElementWrapper("canvas").get$();
+        const canvas = tag("canvas");
         const ctx = canvas.getContext("2d");
 
         for (const [i, arg] of args.entries()) {
@@ -467,12 +477,25 @@ class Grecha {
 
       // @ Quick-Image
       qImage(src) {
-        const image = new ElementWrapper("img").att$("src", src).get$();
+        const image = tag("img").att$("src", src);
         return {
           image,
         };
-      
+
       },
+
+      tabSwitcher(names, choose) {
+        names.map((name, i) => {
+          return tag("a", [
+            tag("p", [
+              name
+            ])
+
+              .att$("href", `#`)
+              .onclick$(() => choose(i))
+          ])
+        })
+      }
 
     }
     // ---
