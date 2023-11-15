@@ -597,10 +597,9 @@ class Grecha {
         )
 
         if (previewCanvas.ctx === null) {
-          alert(
+          throw new MediaError(
             "Unable to initialize WebGL. Your browser or machine may not support it.",
           );
-          return;
         }
 
         return previewCanvas
