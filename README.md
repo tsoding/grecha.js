@@ -1,4 +1,4 @@
-# Grecha-Susha.js
+# Grecha.js
 
 ![KashaHard](KashaHard.gif)
 
