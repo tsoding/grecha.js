@@ -13,12 +13,13 @@
     const kashaHard = img("KashaHard.gif");
 
     const r = router({
+      
       "/": (r) => {
         const [count, setCount] = r.useState(0);
         const [hard, setHard] = r.useState(false);
 
         return div(
-          h1("Grecha.js").link$('asd', 'asd'),
+          h1("Grecha.js"),
           div(a("Foo").att$("href", "#/foo")),
           div(a("Bar").att$("href", "#/bar")),
           div(`Counter: ${count()}`),
@@ -40,6 +41,7 @@
         p(LOREM),
         div(a("Home").att$("href", "#"))
       )
+      
     });
     entry.appendChild(r);
   </script>
