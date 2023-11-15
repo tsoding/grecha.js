@@ -71,7 +71,7 @@ class Grecha {
     }
 
     // @ Tag-init for basic wrapping tags
-    const MUNDANE_TAGS = ["canvas", "h1", "h2", "h3", "p", "a", "div", "span", "select"];
+    const MUNDANE_TAGS = ["canvas", "h1", "h2", "h3", "p", "a", "div", "span"];
 
     for (const tagName of MUNDANE_TAGS) {
       window[tagName] = (...children) => new ElementWrapper(tagName, ...children).get$();
