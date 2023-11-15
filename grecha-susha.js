@@ -517,9 +517,9 @@ class Grecha {
       },
 
       // @ Quick-Canvas
-      qCanvas(...args) {
+      qCanvas(context, ...args) {
         const canvas = canvas();
-        const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext(context || "2d");
 
         for (const [i, arg] of args.entries()) {
           if (typeof arg === "string") {
@@ -583,6 +583,28 @@ class Grecha {
           })
         )
       },
+
+      webgl(w, h) {
+        const p_h = h ?? 112;
+        const p_w = w ?? 112;
+
+        const previewCanvas = this.qCanvas(
+          "webgl",
+          
+          ["width", p_w,],
+          ["height", p_h,],
+          ["class", "preview-canvas",]
+        )
+
+        if (previewCanvas.ctx === null) {
+          alert(
+            "Unable to initialize WebGL. Your browser or machine may not support it.",
+          );
+          return;
+        }
+
+        return previewCanvas
+      }
 
     }
     // ---
