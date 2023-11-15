@@ -199,7 +199,7 @@ class Grecha {
 
     // @ Class Exports
     if (typeof module !== 'undefined') {
-      module.exports = windowMethods;
+      module.exports.Gretcha.Methods = windowMethods;
     } else {
       Object.assign(window, windowMethods);
     }
