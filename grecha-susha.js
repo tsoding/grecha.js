@@ -16,7 +16,12 @@ class Grecha {
       /* We create attractive class. */
 
       constructor(name, ...children) {
-        this.element = document.createElement(name)
+        if (typeof name === "string") {
+          this.element = document.createElement(name);
+
+        } else {
+          this.element = name;
+        }
 
         let methods = this.methods();
 
@@ -296,58 +301,29 @@ class Grecha {
             Object.assign(this.element.style, styleObject);
           },
 
-          stylesheet$: {
-
-            // Stylesheets have more power than inline styles
-            // They always come first
-
-            // Total manipulation of the stylesheet allows for advanced styling
-
-            get ss() {
-              if (!this._stylesheet) {
-                this._stylesheet = document.createElement('style');
-                this.element.appendChild(this._stylesheet);
-              }
+          stylesheet$() {
+            // Stylesheets are cached in the wrapper
+            if (this?._stylesheet) {
               return this._stylesheet;
+            }
 
-            },
+            // Create a new stylesheet
+            const stylesheet = new ElementWrapper(document.createElement('style'));
 
-            set ss(styleSheet) {
-              this._stylesheet = styleSheet;
-            },
-
-            get css() {
-              return this.ss.sheet.cssRules;
-
-            },
-
-            set css(cssRules) {
-              this.ss.sheet.cssRules = cssRules;
-
-            },
-
-
-            // Append rules as strings
-            appendRules$(...rules) {
-              rules.forEach((rule) => {
-                this.ss.sheet.insertRule(rule, this.ss.sheet.cssRules.length);
-              });
-              return this;
-
-            },
-
-            removeRule$(selector) {
-              this.ss.sheet.deleteRule(this.ss.sheet.cssRules.length - 1);
-            },
-
-            important$(selector, rule) {
-              // ... !important
-              this.ss.sheet.insertRule(selector + ' { ' + rule + ' !important; }', this.ss.sheet.cssRules.length);
-            },
-
+            // Append the stylesheet to the wrapper
+            this.append$(stylesheet);
           },
-        }
 
+          bounds$() {
+            return this.element.getBoundingClientRect();
+          },
+
+          str$() {
+            return this.element.outerHTML;
+          
+          },
+
+        }
 
       }
 
@@ -368,6 +344,36 @@ class Grecha {
       return new ElementWrapper(tag, ...children).get$();
     }
 
+    function depadString(str = '', cnln = 0) {
+      // For each line, remove cnln
+
+      var gr_ = () => {
+        return str
+          .split('\n')
+          .map((line) => line.slice(cnln))
+          .join('\n')
+      }
+
+      var lr_ = (am) => {
+        return str
+          .split('\n')
+          .map((line) => ' '.repeat(am) + line)
+          .join('\n')
+      }
+
+      if (cnln < 0) {
+        // Neg, so add WS
+        return lr_(-cnln)
+      }
+
+      else if (cnln < 1) {
+        // Get lenth of whitespace on first line
+        cnln = str.match(/^\s*/)[0].length
+      }
+
+      return gr_()
+    }
+
     // @ Tag-init for basic wrapping tags
     const MUNDANE_TAGS = [
       "canvas",
@@ -380,7 +386,11 @@ class Grecha {
       "a",
 
       "div",
-      "span"
+      "span",
+
+      "html",
+      "head",
+      "body",
     ];
 
     for (const tagName of MUNDANE_TAGS) {
@@ -392,6 +402,10 @@ class Grecha {
     const windowMethods = {
 
       tag,
+
+      htmlDoc(...nodes) {
+        return tag('', ...nodes);
+      },
 
       // @ Basic
       img(src) {
@@ -518,7 +532,7 @@ class Grecha {
 
       // @ Quick-Canvas
       qCanvas(context, ...args) {
-        const canvas = canvas();
+        const canvas = tag('canvas');
         const ctx = canvas.getContext(context || "2d");
 
         for (const [i, arg] of args.entries()) {
@@ -551,7 +565,7 @@ class Grecha {
       },
 
       tabSwitcher(names, choose) {
-        div(
+        return div(
           ...names.map((name, i) => {
             return span(
               a(
@@ -568,7 +582,7 @@ class Grecha {
 
       tabs(ts) {
         const names = Object.keys(ts);
-        const tags = names.map((name, i) => ts[name]);
+        const tags = Object.values(ts);
 
         let active = 0;
         const tabSlot = div(
@@ -576,7 +590,7 @@ class Grecha {
         )
 
         return div(
-          this.tabSwitcher(names, (i) => {
+          tabSwitcher(names, (i) => {
             tabSlot.replaceChildren(tags[active]);
             tabSlot.appendChild(tags[i]);
             active = i;
@@ -590,7 +604,7 @@ class Grecha {
 
         const previewCanvas = this.qCanvas(
           "webgl",
-          
+
           ["width", p_w,],
           ["height", p_h,],
           ["class", "preview-canvas",]
@@ -603,6 +617,64 @@ class Grecha {
         }
 
         return previewCanvas
+      },
+
+      distance(el1, el2) {
+        if (!(el1?.element || el2?.element)) return;
+        const rect1 = el1.element.bounds$();
+        const rect2 = el2.element.bounds$();
+
+        // From Center
+        const x = Math.abs(rect1.x + rect1.width / 2 - rect2.x - rect2.width / 2);
+        const y = Math.abs(rect1.y + rect1.height / 2 - rect2.y - rect2.height / 2);
+        return Math.sqrt(x * x + y * y);
+
+      },
+
+      animate(e, cb) {
+        const shouldLoop = Symbol.for("ShouldLoop");
+        e[shouldLoop] = true;
+
+        let animationFrameId;
+
+        const looper = () => {
+          if (!e[shouldLoop]) {
+            return;
+          }
+
+          cb(() => {
+            e[shouldLoop] = true
+            if (e[shouldLoop]) {
+              animationFrameId = requestAnimationFrame(looper);
+            }
+          });
+
+          animationFrameId = requestAnimationFrame(looper);
+        };
+
+        looper()
+
+        return () => {
+          e[shouldLoop] = false;
+          cancelAnimationFrame(animationFrameId);
+        };
+      },
+
+      // @ Advanced
+
+      depadString,
+
+      createDocument(...args) {
+        return new DOMParser()
+          .parseFromString(args, "text/html")
+      },
+
+      SushaTemplates: {
+        get document() {
+          return createDocument(
+
+          )
+        },
       }
 
     }
@@ -618,7 +690,11 @@ class Grecha {
 
 // @ Module Exports
 if (typeof module !== 'undefined') {
-  module.exports = Grecha;
+  module.exports = {
+    Grecha,
+
+  };
+
 } else {
   window.__Grecha__ = Grecha;
   new Grecha(window);
