@@ -320,7 +320,7 @@ class Grecha {
 
           str$() {
             return this.element.outerHTML;
-          
+
           },
 
         }
@@ -442,6 +442,14 @@ class Grecha {
         // Expose wrapper for quick access
         window[GR_SYM] = resultWrapper;
 
+        let WSt = window[GC_SYM] = {
+          WindowState: {
+            current: null,
+            history: [],
+            stack: [],
+          } 
+        }
+
         // @ CREDIT (FORK): juniorrantila
         for (const k in routes) routes[k].state = { id: 0 };
 
@@ -458,6 +466,7 @@ class Grecha {
         if (!routes[currentLocation.value]) {
           currentLocation.value = '/';
         }
+
         const state = () => routes[currentLocation.value].state;
 
         // ---

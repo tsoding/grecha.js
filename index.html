@@ -7,38 +7,44 @@
 
 <body>
   <div id="entry"></div>
-  <script src="./grecha-susha.js"></script>
-  <script>
+  <!-- <script src="./grecha-susha.js"></script> -->
+  <script src="./module/grecha-susha.mod.js" type="module"></script>
+  <script type="module">
+    import Susha from "./module/grecha-susha.mod.js";
+
     const kasha = img("Kasha.png");
     const kashaHard = img("KashaHard.gif");
 
     const r = router({
-      
+
       "/": (r) => {
         const [count, setCount] = r.useState(0);
         const [hard, setHard] = r.useState(false);
 
+        // setCount(0)
+        // setHard(false)
+
         return div(
           h1("Grecha.js"),
-          
+
           div(a("Foo").att$("href", "#/foo")),
           div(a("Bar").att$("href", "#/bar")),
-          
+
           div(`Counter: ${count()}`),
-          
+
           div(hard() ? kashaHard : kasha).onclick$(() => {
             setCount(count() + 1);
             setHard(!hard());
           }),
         )
       },
-      
+
       "/foo": () => div(
         h1("Foo"),
         p(LOREM),
         div(a("Home").att$("href", "#")),
       ),
-      
+
       "/bar": () => div(
         h1("Bar"),
         p(LOREM),
@@ -51,7 +57,7 @@
         p("You've hit an error page!!"),
         div(a("Home").att$("href", "#"))
       )
-      
+
     });
     entry.appendChild(r);
   </script>
