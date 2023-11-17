@@ -6,7 +6,7 @@ class Grecha {
   static ElementWrapper = ElementWrapper;
   static gm = globalMethods;
   static tag = tag;
-  
+
   constructor(window) {
     let g_ = this;
 
@@ -53,11 +53,11 @@ if (globalThis?.window) {
   window.Susha = new Grecha(window)
 
 } else {
-  
+
   globalThis?.module?.exports
     ? module.exports.Grecha = Susha
     : false;
-  
+
   globalThis?.module?.exports
     ? module.exports.Susha = new Grecha(globalThis)
     : false;
