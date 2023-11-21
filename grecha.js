@@ -49,11 +49,11 @@ function router(routes, options) {
         if (!(hashLocation in routes)) {
             const route404 = options?.route404 ?? '/404';
             console.assert(route404 in routes);
-
             hashLocation = route404;
         }
 
         result.replaceChildren(routes[hashLocation]());
+
         return result;
     };
 
