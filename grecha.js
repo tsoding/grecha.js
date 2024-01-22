@@ -1,18 +1,21 @@
 const LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
-let CURRENT_SCOPE;
+const SCOPE_STACK = [];
+
 function createSignal(value) {
   let dependents = new Set;
+  let prev = new Set;
   return [
     () => {
-      if (CURRENT_SCOPE) dependents.add(CURRENT_SCOPE);
+      if (SCOPE_STACK.length && !SCOPE_STACK.some(x => dependents.has(x)))
+        dependents.add(SCOPE_STACK[SCOPE_STACK.length - 1]);
       return value;
     },
     update => {
       value = update;
-      prev = dependents;
-      dependents = new Set();
-      for (const f of prev) try { f() } catch (e) { console.error(e) }
+      [prev, dependents] = [dependents, prev];
+      dependents.clear();
+      for (const f of prev) try { f() } catch (e) { console.error(e); }
     }
   ]
 }
@@ -21,16 +24,27 @@ function make_node(nodelike) {
   switch (typeof nodelike) {
     case 'function': {
       let node
-      CURRENT_SCOPE = function refresh() {
-        CURRENT_SCOPE = refresh;
-        let update = make_node(nodelike());
-        node.parentNode.replaceChild(update, node);
-        node = update;
-        CURRENT_SCOPE = undefined;
-      } 
-      node = make_node(nodelike());
-      CURRENT_SCOPE = undefined;
-      return node
+      SCOPE_STACK.push(function refresh() {
+        if (node.parentNode) {
+            SCOPE_STACK.push(refresh);
+            let update;
+            try {
+              update = make_node(nodelike());
+            } finally {
+              SCOPE_STACK.pop();
+            }
+            node.parentNode.replaceChild(update, node);
+            node = update;
+          } else {
+            node = undefined;
+          }
+      })
+      try {
+        node = make_node(nodelike());
+      } finally{
+        SCOPE_STACK.pop();
+        return node
+      }
     }
     case 'string':
     case 'number': 
