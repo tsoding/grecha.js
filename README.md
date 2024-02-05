@@ -26,6 +26,7 @@ https://tsoding.github.io/grecha.js/example.html
           h1("Grecha.js"),
           div(a("Foo").att$("href", "#/foo")),
           div(a("Bar").att$("href", "#/bar")),
+          div(a("Something").att$("href", "#/something-notfound")),
           div("Counter: "+count),
           div(hard ? kashaHard : kasha).onclick$(function () {
             count += 1;
@@ -42,7 +43,12 @@ https://tsoding.github.io/grecha.js/example.html
           h1("Bar"),
           p(LOREM),
           div(a("Home").att$("href", "#"))
-        )
+        ),
+        "/404": () => div(
+          h1("404 Not Found"),
+          p("The page you are looking for does not exist."),
+          div(a("Home").att$("href", "#"))
+        ),
       });
       entry.appendChild(r);
     </script>
