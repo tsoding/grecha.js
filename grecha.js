@@ -37,7 +37,6 @@ function input(type) {
 }
 
 function router(routes, route404 = "/404") {
-
     let result = div();
 
     function syncHash() {
@@ -56,14 +55,15 @@ function router(routes, route404 = "/404") {
         return result;
     };
 
+    function destroy() {
+        window.removeEventListener("hashchange", syncHash);
+        result.remove();
+    }
+
     syncHash();
-
-    // TODO(#3): there is way to "destroy" an instance of the router to make it remove it's "hashchange" callback
-
     window.addEventListener("hashchange", syncHash);
-
     result.refresh = syncHash;
+    result.destroy = destroy;
 
     return result;
-
 }
